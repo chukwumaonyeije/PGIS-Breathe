@@ -326,7 +326,7 @@ export default function Home() {
       {/* ─── BREATHE TAB ─── */}
       {activeTab === 'breathe' && (
         /* Desktop: two-column row. Mobile: stacked column */
-        <div className="relative z-10 flex-1 min-h-0 flex flex-col md:flex-row">
+        <div className="relative z-10 flex-1 min-h-0 flex flex-col md:flex-row md:overflow-hidden">
 
           {/* ── ORB COLUMN (left / center on desktop, full on mobile) ── */}
           <div className="flex-1 flex flex-col items-center justify-center px-4 gap-3 md:gap-6 min-h-0 py-4 md:py-6">
@@ -458,9 +458,12 @@ export default function Home() {
           {/* ── PROTOCOL PANEL — desktop right sidebar, hidden on mobile ── */}
           {!isSessionActive && !isCountdown && !isComplete && (
             <div
-              className="hidden md:flex flex-col flex-shrink-0 overflow-y-auto py-5 px-5 safe-bottom"
+              className="hidden md:flex flex-col flex-shrink-0 py-5 px-5 safe-bottom"
               style={{
                 width: 320,
+                minHeight: 0,
+                overflowY: 'auto',
+                overflowX: 'hidden',
                 borderLeft: '1px solid rgba(255,255,255,0.06)',
                 background: 'rgba(0,0,0,0.12)',
               }}
@@ -488,8 +491,8 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Protocol cards — vertical list */}
-              <div className="flex flex-col gap-2.5 flex-1">
+              {/* Protocol cards — vertical list, full-width in sidebar */}
+              <div className="flex flex-col gap-2.5">
                 {filteredProtocols.map((protocol) => (
                   <ProtocolCard
                     key={protocol.id}
@@ -497,6 +500,7 @@ export default function Home() {
                     isSelected={selectedProtocol.id === protocol.id}
                     isNightMode={isNightMode}
                     onClick={() => handleProtocolSelect(protocol)}
+                    fillWidth
                   />
                 ))}
               </div>

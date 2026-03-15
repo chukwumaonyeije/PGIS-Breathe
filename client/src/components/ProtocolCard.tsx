@@ -11,6 +11,8 @@ interface ProtocolCardProps {
   isSelected: boolean;
   isNightMode: boolean;
   onClick: () => void;
+  /** When true, card fills its container width (used in desktop sidebar) */
+  fillWidth?: boolean;
 }
 
 const DIFFICULTY_LABELS = {
@@ -30,6 +32,7 @@ export default function ProtocolCard({
   isSelected,
   isNightMode,
   onClick,
+  fillWidth = false,
 }: ProtocolCardProps) {
   const totalSeconds = protocol.phases.reduce((s, p) => s + p.duration, 0);
 
@@ -41,8 +44,9 @@ export default function ProtocolCard({
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onClick()}
       style={{
-        minWidth: 200,
-        maxWidth: 240,
+        minWidth: fillWidth ? 0 : 200,
+        maxWidth: fillWidth ? '100%' : 240,
+        width: fillWidth ? '100%' : undefined,
         borderColor: isSelected ? protocol.color : undefined,
         boxShadow: isSelected ? `0 0 24px ${protocol.glowColor}` : undefined,
       }}
