@@ -164,6 +164,30 @@
     padding-right: 1rem;
   }
 
+  /* ─── App-level centered container for desktop ─── */
+  .app-container {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* ─── HRV tab content container ─── */
+  .hrv-container {
+    width: 100%;
+    max-width: 28rem; /* ~448px, matches max-w-sm on mobile */
+  }
+
+  @media (min-width: 768px) {
+    .app-container {
+      max-width: 56rem; /* ~896px — comfortable desktop width */
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hrv-container {
+      max-width: 52rem; /* wider two-column layout */
+    }
+  }
+
   .flex {
     min-height: 0;
     min-width: 0;
@@ -340,6 +364,20 @@
 ::-webkit-scrollbar-thumb {
   background: oklch(1 0 0 / 0.15);
   border-radius: 2px;
+}
+
+/* ─── Desktop enhancements ─── */
+@media (min-width: 768px) {
+  /* Slightly larger base font for desktop readability */
+  .phase-label {
+    font-size: 1.15rem;
+  }
+
+  /* Protocol card hover more pronounced on desktop */
+  .protocol-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }
 }
 
 /* ─── Safe area for mobile ─── */
