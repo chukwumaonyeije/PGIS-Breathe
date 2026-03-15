@@ -325,8 +325,11 @@ export default function Home() {
 
       {/* ─── BREATHE TAB ─── */}
       {activeTab === 'breathe' && (
-        <>
-          <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 gap-3 md:gap-5 min-h-0">
+        /* Desktop: two-column row. Mobile: stacked column */
+        <div className="relative z-10 flex-1 min-h-0 flex flex-col md:flex-row">
+
+          {/* ── ORB COLUMN (left / center on desktop, full on mobile) ── */}
+          <div className="flex-1 flex flex-col items-center justify-center px-4 gap-3 md:gap-6 min-h-0 py-4 md:py-6">
             {isComplete ? (
               <div className="w-full max-w-sm">
                 <SessionComplete
@@ -342,13 +345,13 @@ export default function Home() {
             ) : (
               <>
                 {/* Protocol name / Timer */}
-                <div className="text-center flex-shrink-0" style={{ minHeight: 48 }}>
+                <div className="text-center flex-shrink-0" style={{ minHeight: 52 }}>
                   {isIdle && (
                     <div className="animate-fade-in">
                       <h2 className="font-display text-white text-xl md:text-2xl font-semibold leading-tight">
                         {selectedProtocol.name}
                       </h2>
-                      <p className="text-white/40 text-sm mt-0.5">{selectedProtocol.subtitle}</p>
+                      <p className="text-white/40 text-sm mt-1">{selectedProtocol.subtitle}</p>
                     </div>
                   )}
                   {(isSessionActive || isCountdown) && (
@@ -398,7 +401,7 @@ export default function Home() {
                 </div>
 
                 {/* Phase instruction */}
-                <div className="text-center flex-shrink-0" style={{ minHeight: 40 }}>
+                <div className="text-center flex-shrink-0" style={{ minHeight: 44 }}>
                   {isSessionActive && breathingState.currentPhase && (
                     <div className="animate-fade-in" key={breathingState.currentPhaseIndex}>
                       <p className="phase-label text-white/75 text-base md:text-lg" style={{ textShadow: `0 0 16px ${accentGlow}` }}>
@@ -452,112 +455,157 @@ export default function Home() {
             )}
           </div>
 
-          {/* Protocol selector */}
+          {/* ── PROTOCOL PANEL — desktop right sidebar, hidden on mobile ── */}
           {!isSessionActive && !isCountdown && !isComplete && (
-            <div className="relative z-10 flex-shrink-0 pb-2 safe-bottom">
-              <div className="app-container">
-                <div className="flex items-center justify-between px-4 mb-2">
-                  <span className="text-white/35 text-xs font-semibold uppercase tracking-widest">
-                    {isNightMode ? 'Night Protocols' : 'Day Protocols'}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    {[5, 10, 15, 20].map((min) => (
-                      <button
-                        key={min}
-                        onClick={() => setSessionMinutes(min)}
-                        className="px-2 py-0.5 rounded text-xs font-semibold transition-all"
-                        style={{
-                          background: sessionMinutes === min ? accentDim : 'transparent',
-                          color: sessionMinutes === min ? accentColor : 'rgba(255,255,255,0.25)',
-                          border: `1px solid ${sessionMinutes === min ? accentBorder : 'transparent'}`,
-                        }}
-                      >
-                        {min}m
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Protocol cards: horizontal scroll on mobile, grid on desktop */}
-                <div
-                  className="protocol-cards-mobile md:hidden flex gap-3 overflow-x-auto px-4 pb-1"
-                  style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
-                >
-                  {filteredProtocols.map((protocol) => (
-                    <div key={protocol.id} style={{ scrollSnapAlign: 'start', flexShrink: 0 }}>
-                      <ProtocolCard
-                        protocol={protocol}
-                        isSelected={selectedProtocol.id === protocol.id}
-                        isNightMode={isNightMode}
-                        onClick={() => handleProtocolSelect(protocol)}
-                      />
-                    </div>
+            <div
+              className="hidden md:flex flex-col flex-shrink-0 overflow-y-auto py-5 px-5 safe-bottom"
+              style={{
+                width: 320,
+                borderLeft: '1px solid rgba(255,255,255,0.06)',
+                background: 'rgba(0,0,0,0.12)',
+              }}
+            >
+              {/* Duration picker */}
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-white/35 text-xs font-semibold uppercase tracking-widest">
+                  {isNightMode ? 'Night Protocols' : 'Day Protocols'}
+                </span>
+                <div className="flex items-center gap-1">
+                  {[5, 10, 15, 20].map((min) => (
+                    <button
+                      key={min}
+                      onClick={() => setSessionMinutes(min)}
+                      className="px-2 py-0.5 rounded text-xs font-semibold transition-all"
+                      style={{
+                        background: sessionMinutes === min ? accentDim : 'transparent',
+                        color: sessionMinutes === min ? accentColor : 'rgba(255,255,255,0.25)',
+                        border: `1px solid ${sessionMinutes === min ? accentBorder : 'transparent'}`,
+                      }}
+                    >
+                      {min}m
+                    </button>
                   ))}
                 </div>
+              </div>
 
-                {/* Desktop grid */}
-                <div className="hidden md:grid md:grid-cols-3 gap-3 px-4 pb-1">
-                  {filteredProtocols.map((protocol) => (
+              {/* Protocol cards — vertical list */}
+              <div className="flex flex-col gap-2.5 flex-1">
+                {filteredProtocols.map((protocol) => (
+                  <ProtocolCard
+                    key={protocol.id}
+                    protocol={protocol}
+                    isSelected={selectedProtocol.id === protocol.id}
+                    isNightMode={isNightMode}
+                    onClick={() => handleProtocolSelect(protocol)}
+                  />
+                ))}
+              </div>
+
+              {/* About this protocol — always visible in sidebar */}
+              <div
+                className="mt-4 rounded-xl p-3 text-xs"
+                style={{ background: accentDim, border: `1px solid ${accentBorder}` }}
+              >
+                <p className="font-semibold mb-1" style={{ color: accentColor }}>{selectedProtocol.name}</p>
+                <p className="text-white/50 leading-relaxed mb-2">{selectedProtocol.description}</p>
+                <div className="border-t pt-2" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
+                  <p className="text-white/35 font-semibold uppercase tracking-wider mb-1" style={{ fontSize: '0.6rem' }}>Evidence</p>
+                  <p className="text-white/45 leading-relaxed">{selectedProtocol.evidence}</p>
+                  <p className="text-white/22 mt-1 italic">{selectedProtocol.citation}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── PROTOCOL SELECTOR — mobile bottom strip (unchanged) ── */}
+          {!isSessionActive && !isCountdown && !isComplete && (
+            <div className="md:hidden relative z-10 flex-shrink-0 pb-2 safe-bottom">
+              <div className="flex items-center justify-between px-4 mb-2">
+                <span className="text-white/35 text-xs font-semibold uppercase tracking-widest">
+                  {isNightMode ? 'Night Protocols' : 'Day Protocols'}
+                </span>
+                <div className="flex items-center gap-1">
+                  {[5, 10, 15, 20].map((min) => (
+                    <button
+                      key={min}
+                      onClick={() => setSessionMinutes(min)}
+                      className="px-2 py-0.5 rounded text-xs font-semibold transition-all"
+                      style={{
+                        background: sessionMinutes === min ? accentDim : 'transparent',
+                        color: sessionMinutes === min ? accentColor : 'rgba(255,255,255,0.25)',
+                        border: `1px solid ${sessionMinutes === min ? accentBorder : 'transparent'}`,
+                      }}
+                    >
+                      {min}m
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div
+                className="flex gap-3 overflow-x-auto px-4 pb-1"
+                style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}
+              >
+                {filteredProtocols.map((protocol) => (
+                  <div key={protocol.id} style={{ scrollSnapAlign: 'start', flexShrink: 0 }}>
                     <ProtocolCard
-                      key={protocol.id}
                       protocol={protocol}
                       isSelected={selectedProtocol.id === protocol.id}
                       isNightMode={isNightMode}
                       onClick={() => handleProtocolSelect(protocol)}
                     />
-                  ))}
-                </div>
+                  </div>
+                ))}
+              </div>
 
-                <div className="px-4 mt-1.5 flex items-center justify-between">
-                  <button
-                    onClick={() => setShowProtocolDetail(d => !d)}
-                    className="text-xs flex items-center gap-1 transition-colors"
-                    style={{ color: accentColor + '88' }}
+              <div className="px-4 mt-1.5 flex items-center justify-between">
+                <button
+                  onClick={() => setShowProtocolDetail(d => !d)}
+                  className="text-xs flex items-center gap-1 transition-colors"
+                  style={{ color: accentColor + '88' }}
+                >
+                  <svg
+                    width="11" height="11" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ transform: showProtocolDetail ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
                   >
-                    <svg
-                      width="11" height="11" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                      style={{ transform: showProtocolDetail ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
-                    >
-                      <polyline points="6 9 12 15 18 9" />
-                    </svg>
-                    {showProtocolDetail ? 'Hide details' : 'About this protocol'}
-                  </button>
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                  {showProtocolDetail ? 'Hide details' : 'About this protocol'}
+                </button>
 
-                  {/* Blog link — mobile only (desktop shows in header) */}
-                  <a
-                    href="https://DoctorsWhoCode.blog"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="md:hidden text-xs flex items-center gap-1 transition-colors hover:opacity-80"
-                    style={{ color: 'rgba(255,255,255,0.22)' }}
-                  >
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                      <polyline points="15 3 21 3 21 9" />
-                      <line x1="10" y1="14" x2="21" y2="3" />
-                    </svg>
-                    DoctorsWhoCode.blog
-                  </a>
-                </div>
+                <a
+                  href="https://DoctorsWhoCode.blog"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs flex items-center gap-1 transition-colors hover:opacity-80"
+                  style={{ color: 'rgba(255,255,255,0.22)' }}
+                >
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                  DoctorsWhoCode.blog
+                </a>
+              </div>
 
-                {showProtocolDetail && (
-                  <div className="px-4 mt-2">
-                    <div className="glass-card p-3 animate-fade-in-up max-h-44 overflow-y-auto">
-                      <h4 className="font-display text-white font-semibold text-sm mb-1">{selectedProtocol.name}</h4>
-                      <p className="text-white/55 text-xs leading-relaxed mb-2">{selectedProtocol.description}</p>
-                      <div className="border-t border-white/08 pt-2">
-                        <p className="text-white/35 text-xs font-semibold uppercase tracking-wider mb-1">Evidence</p>
-                        <p className="text-white/50 text-xs leading-relaxed">{selectedProtocol.evidence}</p>
-                        <p className="text-white/25 text-xs mt-1 italic">{selectedProtocol.citation}</p>
-                      </div>
+              {showProtocolDetail && (
+                <div className="px-4 mt-2">
+                  <div className="glass-card p-3 animate-fade-in-up max-h-44 overflow-y-auto">
+                    <h4 className="font-display text-white font-semibold text-sm mb-1">{selectedProtocol.name}</h4>
+                    <p className="text-white/55 text-xs leading-relaxed mb-2">{selectedProtocol.description}</p>
+                    <div className="border-t border-white/08 pt-2">
+                      <p className="text-white/35 text-xs font-semibold uppercase tracking-wider mb-1">Evidence</p>
+                      <p className="text-white/50 text-xs leading-relaxed">{selectedProtocol.evidence}</p>
+                      <p className="text-white/25 text-xs mt-1 italic">{selectedProtocol.citation}</p>
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
-        </>
+        </div>
       )}
 
       {/* ─── HRV LOG TAB ─── */}
